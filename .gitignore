@@ -1,0 +1,47 @@
+# Audio recordings — never commit
+*.m4a
+*.mp3
+*.wav
+*.aiff
+*.aac
+*.flac
+*.ogg
+*.mp4
+*.mov
+
+# Transcripts and logs — never commit
+*.transcript
+*.log
+*.tmp
+
+# Local configuration
+.env
+config.env
+.config/
+local.config
+
+# Job/customer data folders
+/private/
+/local/
+/exports/
+/transcripts/
+/Call Transcripts/
+**/Call Transcripts/
+job-*/
+sample-recordings/
+
+# macOS clutter
+.DS_Store
+.AppleDouble
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Note: We do NOT blanket-ignore *.txt because future text-based examples may need to be tracked.
+# If a sensitive *.txt would otherwise be committed, place it under one of the ignored dirs above.
