@@ -1,6 +1,6 @@
 # Upstream bug report — MacWhisper `mw` CLI min-OS mismatch
 
-Suggested email body to send to **support@macwhisper.com**. Subject and content are below — paste, fill in your version numbers, and send.
+Suggested email body to send to **<support@macwhisper.com>**. Subject and content are below — paste, fill in your version numbers, and send.
 
 ---
 

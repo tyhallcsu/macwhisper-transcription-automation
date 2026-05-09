@@ -65,6 +65,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install zsh (needed by check_readme_assets.sh)
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
       - name: No audio / transcripts / env files tracked
         run: |
           set -e
