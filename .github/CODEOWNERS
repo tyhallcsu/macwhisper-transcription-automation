@@ -1,0 +1,6 @@
+# Default reviewer for everything.
+* @tyhallcsu
+
+# CI / release surface needs extra care.
+/.github/ @tyhallcsu
+/scripts/ @tyhallcsu

@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract changelog section for this tag
+        id: notes
+        run: |
+          set -e
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          awk -v ver="$version" '
+            $0 ~ "^## \\[" ver "\\]" {flag=1; next}
+            /^## \[/ && flag {exit}
+            flag {print}
+          ' CHANGELOG.md > /tmp/release-notes.md
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "No matching CHANGELOG section for $tag — generating fallback notes." >&2
+            printf '## %s\n\nSee CHANGELOG.md for the full history.\n' "$tag" > /tmp/release-notes.md
+          fi
+          echo "----- release notes -----"
+          cat /tmp/release-notes.md
+          echo "-------------------------"
+
+      - name: Build source tarball
+        run: |
+          set -e
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          mkdir -p dist
+          git archive \
+            --format=tar.gz \
+            --prefix="macwhisper-transcription-automation-${version}/" \
+            -o "dist/macwhisper-transcription-automation-${version}.tar.gz" \
+            "$tag"
+          (cd dist && shasum -a 256 *.tar.gz > SHA256SUMS.txt)
+          ls -la dist
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          body_path: /tmp/release-notes.md
+          files: |
+            dist/*.tar.gz
+            dist/SHA256SUMS.txt
+          fail_on_unmatched_files: true
+          generate_release_notes: false

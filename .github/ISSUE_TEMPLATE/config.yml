@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/tyhallcsu/macwhisper-transcription-automation/security/advisories/new
+    about: Please report security issues privately, not as public issues.
+  - name: MacWhisper CLI bug
+    url: mailto:support@macwhisper.com
+    about: If `mw` itself is broken, contact MacWhisper support — see docs/upstream-bug-report.md.

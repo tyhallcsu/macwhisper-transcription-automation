@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install zsh
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: zsh syntax check
+        run: |
+          set -e
+          for f in scripts/*.sh scripts/*.zsh; do
+            echo "==> zsh -n $f"
+            zsh -n "$f"
+          done
+
+      - name: shellcheck (best-effort, bash mode)
+        uses: ludeeus/action-shellcheck@2.0.0
+        continue-on-error: true
+        with:
+          severity: warning
+          additional_files: 'scripts/check_readme_assets.sh scripts/doctor.sh scripts/install.sh scripts/transcribe_call.zsh'
+          format: gcc
+
+      - name: markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v17
+        with:
+          globs: |
+            **/*.md
+            !ai-generated-images/**
+            !node_modules/**
+
+      - name: actionlint
+        run: |
+          curl -sSLO https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash
+          bash ./download-actionlint.bash
+          ./actionlint -color
+
+      - name: link check
+        uses: lycheeverse/lychee-action@v2
+        continue-on-error: true
+        with:
+          args: --no-progress --max-concurrency 4 --exclude-mail 'README.md' 'docs/**/*.md' 'CONTRIBUTING.md' 'SECURITY.md' 'CODE_OF_CONDUCT.md'
+
+  privacy-guard:
+    name: Privacy guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No audio / transcripts / env files tracked
+        run: |
+          set -e
+          forbidden="$(git ls-files | grep -Ei '\.(m4a|mp3|wav|aiff|aac|flac|ogg|mov|mp4|transcript)$|^transcripts/|^exports/|Call Transcripts/|^private/' || true)"
+          if [ -n "$forbidden" ]; then
+            echo "::error::Forbidden private files tracked:"
+            printf '%s\n' "$forbidden"
+            exit 1
+          fi
+          echo "OK — no private/audio files tracked."
+
+      - name: README image references resolve
+        run: |
+          chmod +x scripts/check_readme_assets.sh
+          ./scripts/check_readme_assets.sh
+
+  smoke:
+    name: macOS smoke test (whisper.cpp engine)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install whisper.cpp
+        run: brew install whisper-cpp
+
+      - name: Cache whisper.cpp tiny.en model
+        id: model-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/whisper-cpp/models
+          key: whisper-tiny-en-v1
+
+      - name: Download tiny.en model (cache miss)
+        if: steps.model-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.local/share/whisper-cpp/models
+          curl -L --fail -o ~/.local/share/whisper-cpp/models/ggml-tiny.en.bin \
+            https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin
+
+      - name: Set executable bits
+        run: chmod +x scripts/*.zsh scripts/*.sh
+
+      - name: doctor
+        run: ./scripts/doctor.sh
+        env:
+          WHISPER_MODEL: /Users/runner/.local/share/whisper-cpp/models/ggml-tiny.en.bin
+
+      - name: Generate test audio
+        run: say -o /tmp/cli_test.aiff "this is a github continuous integration smoke test"
+
+      - name: Run transcribe_call.zsh end-to-end
+        env:
+          TRANSCRIBE_ENGINE: whisper-cpp
+          WHISPER_MODEL: /Users/runner/.local/share/whisper-cpp/models/ggml-tiny.en.bin
+        run: |
+          mkdir -p /tmp/test-job
+          out="$(./scripts/transcribe_call.zsh /tmp/cli_test.aiff /tmp/test-job)"
+          printf '%s\n' "$out"
+          if [ -z "${out//[[:space:]]/}" ]; then
+            echo "::error::transcribe_call.zsh produced empty stdout"
+            exit 1
+          fi
+
+      - name: Verify transcript file landed
+        run: |
+          shopt -s nullglob 2>/dev/null || true
+          files=( /tmp/test-job/Call\ Transcripts/*.txt )
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::No transcript .txt was written"
+            exit 1
+          fi
+          echo "Wrote: ${files[0]}"
+          head -10 "${files[0]}"

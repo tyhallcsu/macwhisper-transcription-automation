@@ -2,15 +2,22 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] — 2026-05-09
 
 ### Added
+- Repo went **public** under `tyhallcsu/macwhisper-transcription-automation` (MIT licensed).
+- **CI pipeline** (`.github/workflows/ci.yml`): `zsh -n` syntax check, ShellCheck (best-effort), markdownlint, actionlint, link check, privacy-guard (no audio/transcript files tracked, README image refs resolve), and a macOS smoke test that installs `whisper-cpp`, generates audio with `say`, and runs `transcribe_call.zsh` end-to-end against the `tiny.en` ggml model.
+- **Release pipeline** (`.github/workflows/release.yml`): tag-driven, extracts the matching CHANGELOG section as release notes, builds a versioned source tarball plus `SHA256SUMS.txt`, and publishes the GitHub release.
+- **Public-repo standards**: `SECURITY.md` (private vulnerability reporting), `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), `.github/CODEOWNERS`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.{yml}`, and `.github/dependabot.yml` (weekly GitHub Actions version updates).
+- README badge row for CI status, latest release, license, and platform.
+- `.markdownlint-cli2.jsonc` to keep markdownlint scoped to meaningful rules.
 - Real generated raster image assets for README presentation: hero image, app icon, feature icons, and social preview candidate.
 - `docs/assets.md` and `assets/prompts/image-generation-prompts.md` for asset inventory, privacy rules, and regeneration prompts.
 - `scripts/check_readme_assets.sh` to verify local README image references exist.
 
 ### Changed
 - README redesigned into a polished GitHub project page with centered visual hero, feature grid, workflow diagram, privacy guardrails, and asset documentation links.
+- Renamed the example Shortcut from `ESS Transcribe Call Recording` → `Transcribe Call Recording` in public-facing docs (you can name the Shortcut on your own machine whatever you like).
 
 ## [0.2.0] — 2026-05-08
 

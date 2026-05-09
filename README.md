@@ -7,6 +7,12 @@
     <a href="docs/shortcut-workflow.md"><img alt="Shortcut workflow" src="https://img.shields.io/badge/macOS-Shortcuts-f59e0b?style=for-the-badge&labelColor=111827"></a>
     <a href="docs/troubleshooting.md"><img alt="Local transcription" src="https://img.shields.io/badge/transcription-local-38bdf8?style=for-the-badge&labelColor=111827"></a>
   </p>
+  <p>
+    <a href="https://github.com/tyhallcsu/macwhisper-transcription-automation/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/tyhallcsu/macwhisper-transcription-automation/actions/workflows/ci.yml/badge.svg"></a>
+    <a href="https://github.com/tyhallcsu/macwhisper-transcription-automation/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/tyhallcsu/macwhisper-transcription-automation?display_name=tag&sort=semver"></a>
+    <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+    <a href="https://www.apple.com/macos/"><img alt="Platform: macOS" src="https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey.svg"></a>
+  </p>
 </div>
 
 <p align="center">
@@ -100,7 +106,7 @@ Then build the Shortcut: **[docs/shortcut-workflow.md](docs/shortcut-workflow.md
 
 ## Shortcut Summary
 
-Create a macOS Shortcut named **ESS Transcribe Call Recording**:
+Create a macOS Shortcut named **Transcribe Call Recording**:
 
 1. Enable **Use as Quick Action** and **Use from Share Sheet**.
 2. Accept `Audio` and `Files`.
@@ -141,7 +147,7 @@ Script Version: 0.2.0
 
 ## Privacy Guardrails
 
-This repo is private, but it is built like a project that could safely be public.
+This repo is public; it has always been built so that nothing private would land in git in the first place.
 
 - No audio files, transcripts, customer folders, tokens, or local env files should ever be committed.
 - `.gitignore` blocks common recording formats, transcript folders, logs, local config, and private/export folders.

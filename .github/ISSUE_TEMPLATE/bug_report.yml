@@ -1,0 +1,70 @@
+name: Bug report
+description: Something in this repo's scripts, docs, or workflows isn't working.
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. Please **do not** include any real audio recordings, transcripts, customer/job names, addresses, or paths under `/Users/<your-name>/...` in this report.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the actual behavior. Include any error message you saw on stderr.
+      placeholder: |
+        Ran transcribe_call.zsh with a sample.m4a from /tmp and got ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `./scripts/doctor.sh`
+        2. Run `~/bin/transcribe_call.zsh /tmp/test.m4a /tmp/test-job`
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of ./scripts/doctor.sh
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: e.g. 15.7.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Transcription engine in use
+      options:
+        - MacWhisper CLI (mw)
+        - whisper.cpp (whisper-cli)
+        - auto (script picked one)
+        - unknown / N/A
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Logs, screenshots (with no sensitive content), upstream version numbers, etc.

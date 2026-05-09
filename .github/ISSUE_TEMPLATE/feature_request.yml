@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest a small, focused improvement.
+labels: [enhancement, triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem this solves
+      description: What workflow friction or gap does this address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Concrete description of the behavior you'd like. Tradeoffs welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches and why this one wins.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This stays a local-first tool (no cloud transcription, no telemetry).
+          required: true
+        - label: This does not require scraping the Apple Notes SQLite database.
+          required: true

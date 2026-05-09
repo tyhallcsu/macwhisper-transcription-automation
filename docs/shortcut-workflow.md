@@ -10,7 +10,7 @@ This Shortcut takes an audio file (typically a call recording shared from Apple 
 ## Build the Shortcut
 
 1. Open **Shortcuts.app**.
-2. Click **+** to create a new shortcut. Name it **`ESS Transcribe Call Recording`** (or any name you prefer).
+2. Click **+** to create a new shortcut. Name it **`Transcribe Call Recording`** (or whatever fits your naming scheme — a prefix like `ACME Transcribe Call Recording` is fine, it's purely cosmetic).
 3. Open the **Shortcut details** panel (top-right toggle):
    - Enable **Use as Quick Action**.
    - Enable **Use from Share Sheet**.
@@ -49,7 +49,7 @@ This Shortcut takes an audio file (typically a call recording shared from Apple 
 ## End-to-end
 
 1. In Apple Notes, locate the call recording. Right-click → **Save Attachment…** to a known folder (e.g. `~/Downloads`), or use **Share Audio**.
-2. From Finder/the Share Sheet, send the audio file to **ESS Transcribe Call Recording**.
+2. From Finder/the Share Sheet, send the audio file to **Transcribe Call Recording**.
 3. Pick the job folder.
 4. Wait for MacWhisper to finish.
 5. The `.txt` lands in `<job_folder>/Call Transcripts/`, and the same text appends below the original Note's audio attachment.
@@ -70,6 +70,6 @@ Resulting transcript filename:
 ## Quick Action variant
 
 You can run the same Shortcut as a Finder Quick Action:
-1. Right-click the audio file in Finder → **Quick Actions** → **ESS Transcribe Call Recording**.
+1. Right-click the audio file in Finder → **Quick Actions** → **Transcribe Call Recording**.
 2. Pick the job folder.
 3. Open the Note manually and paste/append the result if you skipped Action 4 above.
