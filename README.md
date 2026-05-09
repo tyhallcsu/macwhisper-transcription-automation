@@ -12,7 +12,7 @@ This repo collapses that into: **right-click the recording → Share → done.**
 
 1. You share the call recording from Apple Notes (or Finder) into a macOS Shortcut.
 2. The Shortcut prompts for the job folder.
-3. A zsh script invokes the **MacWhisper CLI** (`mw transcribe`).
+3. A zsh script transcribes the audio through whichever engine is available — MacWhisper CLI (`mw transcribe`) when it works, or `whisper.cpp` as an automatic fallback.
 4. The transcript is saved as a timestamped `.txt` under `<job_folder>/Call Transcripts/`.
 5. The same plaintext is returned to the Shortcut, which appends it directly under the original recording in the Note.
 
@@ -22,18 +22,22 @@ No Notes-database scraping, no AppleScript reverse-engineering, no third-party s
 
 - One-click Share Sheet integration via macOS Shortcuts.
 - Per-call job-folder routing — never lose track of which call goes where.
-- Header block on every transcript: source audio, timestamp, model, script version.
+- **Two-engine auto-failover.** Prefers MacWhisper's `mw` CLI; transparently falls back to `whisper.cpp` (`whisper-cli`) when `mw` can't load. Force one with `TRANSCRIBE_ENGINE=mw|whisper-cpp`.
+- Header block on every transcript: source audio, timestamp, engine + model used, script version.
 - Robust filename sanitisation for tricky recording names.
-- Optional model override via `MW_MODEL` env / config file.
-- Built-in `doctor.sh` to surface install/version issues fast.
+- Optional model overrides via `MW_MODEL` / `WHISPER_MODEL` / `WHISPER_LANG` env vars or config file.
+- Built-in `doctor.sh` reports which engine(s) are usable on this host.
 - Strict zsh, strict-mode, error-to-stderr — safe to chain in Shortcuts.
 
 ## Requirements
 
 - macOS (tested on 15+).
-- **MacWhisper Pro** with the Command-Line Tool installed (Settings → Advanced → Command-Line Tool).
+- At least one transcription engine:
+  - **MacWhisper Pro** with the Command-Line Tool installed (Settings → Advanced → Command-Line Tool), **or**
+  - **whisper.cpp** via `brew install whisper-cpp` plus a ggml model file (default expected at `~/.local/share/whisper-cpp/models/ggml-base.en.bin`).
 - Apple Shortcuts.app (preinstalled).
 - zsh (default macOS shell).
+- `afconvert` (built-in macOS) — used when transcoding for the whisper.cpp path.
 
 ## Quick start
 

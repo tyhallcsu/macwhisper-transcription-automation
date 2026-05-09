@@ -2,7 +2,11 @@
 
 Tested on macOS 15+ with MacWhisper Pro and Apple's Shortcuts.app.
 
-## 1. Install MacWhisper and enable the CLI
+## 1. Install at least one transcription engine
+
+You need either MacWhisper's CLI or whisper.cpp. The script auto-prefers `mw`; if it can't load, it falls back to `whisper-cli`.
+
+### Option A — MacWhisper CLI
 
 1. Install **MacWhisper** from [https://goodsnooze.gumroad.com/l/macwhisper](https://goodsnooze.gumroad.com/l/macwhisper) or the Mac App Store. The CLI requires **MacWhisper Pro**.
 2. Open MacWhisper → **Settings** → **Advanced** → **Command-Line Tool** → **Install**. This creates `/usr/local/bin/mw`.
@@ -10,7 +14,24 @@ Tested on macOS 15+ with MacWhisper Pro and Apple's Shortcuts.app.
    ```sh
    mw version
    ```
-   You should see a version line. If you see a `Library not loaded` or `newer than running OS` error, see [troubleshooting.md](troubleshooting.md).
+   If you see `Library not loaded` / `newer than running OS`, you've hit the upstream packaging mismatch documented in [troubleshooting.md](troubleshooting.md). Use Option B for now.
+
+### Option B — whisper.cpp (recommended fallback today)
+
+```sh
+brew install whisper-cpp
+mkdir -p ~/.local/share/whisper-cpp/models
+curl -L -o ~/.local/share/whisper-cpp/models/ggml-base.en.bin \
+  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+```
+
+(`base.en` is ~150 MB. For different size/quality trade-offs, replace `base.en` with `tiny.en`, `small.en`, `medium.en`, or `large-v3` in both the filename and the URL. Override at runtime with `WHISPER_MODEL=/path/to/your/model.bin`.)
+
+Verify:
+```sh
+whisper-cli --help | head -5
+ls ~/.local/share/whisper-cpp/models/
+```
 
 ## 2. Clone and install this repo
 

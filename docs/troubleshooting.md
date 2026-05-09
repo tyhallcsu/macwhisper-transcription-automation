@@ -23,11 +23,16 @@ You cannot work around this with `DYLD_FRAMEWORK_PATH`, library shimming, or env
 
 **What to do:**
 
-1. **Report it to MacWhisper support** (`support@macwhisper.com`). The fix is for them to rebuild `mw` with the same `-mmacosx-version-min` flag the GUI uses (14.0).
-2. **Until then**, transcribe via the MacWhisper GUI's Watch Folders feature (see [watch-folder.md](watch-folder.md)) and use this repo's Shortcut only for the file-routing/Notes-append part.
-3. **Or**, install an alternative engine like `whisper.cpp` (`brew install whisper-cpp`) and run the Shortcut against that. Ask in this repo and we can wire `transcribe_call.zsh` to fall back to it.
-
-After MacWhisper ships a corrected `mw`, re-run **Settings → Advanced → Command-Line Tool → Install** and then `./scripts/doctor.sh`.
+1. **The script already handles this.** As of v0.2.0, `transcribe_call.zsh` auto-detects when `mw` can't load and falls back to `whisper.cpp` if it's installed. Set up the fallback once and you're unblocked:
+   ```sh
+   brew install whisper-cpp
+   mkdir -p ~/.local/share/whisper-cpp/models
+   curl -L -o ~/.local/share/whisper-cpp/models/ggml-base.en.bin \
+     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+   ./scripts/doctor.sh
+   ```
+2. **Report the upstream bug to MacWhisper support** (`support@macwhisper.com`) — see the suggested email body in [docs/upstream-bug-report.md](upstream-bug-report.md). The fix is for them to rebuild `mw` with the same min-OS target the GUI uses (14.0).
+3. After MacWhisper ships a corrected `mw`, re-run **Settings → Advanced → Command-Line Tool → Install** and then `./scripts/doctor.sh`. The script will switch back to `mw` automatically.
 
 ## Shortcut runs but the transcript is empty
 
