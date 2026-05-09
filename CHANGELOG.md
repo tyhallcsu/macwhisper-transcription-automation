@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Real generated raster image assets for README presentation: hero image, app icon, feature icons, and social preview candidate.
+- `docs/assets.md` and `assets/prompts/image-generation-prompts.md` for asset inventory, privacy rules, and regeneration prompts.
+- `scripts/check_readme_assets.sh` to verify local README image references exist.
+
+### Changed
+- README redesigned into a polished GitHub project page with centered visual hero, feature grid, workflow diagram, privacy guardrails, and asset documentation links.
+
 ## [0.2.0] — 2026-05-08
 
 ### Added

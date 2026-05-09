@@ -1,109 +1,207 @@
-# MacWhisper Transcription Automation
+<div align="center">
+  <img src="assets/icons/app-icon.png" width="104" alt="MacWhisper Transcription Automation app icon">
+  <h1>MacWhisper Transcription Automation</h1>
+  <p><strong>Export an Apple Notes call recording, transcribe it locally, save the transcript to the right job folder, and append the text back into Notes.</strong></p>
+  <p>
+    <a href="docs/setup.md"><img alt="Setup" src="https://img.shields.io/badge/setup-ready-14b8a6?style=for-the-badge&labelColor=111827"></a>
+    <a href="docs/shortcut-workflow.md"><img alt="Shortcut workflow" src="https://img.shields.io/badge/macOS-Shortcuts-f59e0b?style=for-the-badge&labelColor=111827"></a>
+    <a href="docs/troubleshooting.md"><img alt="Local transcription" src="https://img.shields.io/badge/transcription-local-38bdf8?style=for-the-badge&labelColor=111827"></a>
+  </p>
+</div>
 
-A small macOS toolkit that turns Apple Notes call recordings into searchable text — saved into the right job folder and appended back into the original Note — via a single Share Sheet click.
+<p align="center">
+  <picture>
+    <source srcset="assets/images/hero-macwhisper-notes-transcription.webp" type="image/webp">
+    <img src="assets/images/hero-macwhisper-notes-transcription.png" alt="Premium workflow visual showing an audio recording flowing through a transcription engine into a job folder and Notes transcript" width="100%">
+  </picture>
+</p>
 
-## Why
+## Why It Exists
 
-Recording calls in Apple Notes is easy. Doing anything *useful* with those recordings is not: the audio sits buried inside a Note, with no project context, no full-text search, and no way to skim. Manually opening MacWhisper, picking a model, exporting, renaming, filing, and pasting back into Notes is several minutes of friction per call.
+Apple Notes makes call recording easy, but the useful follow-up work still takes too many clicks: export the audio, open a transcription app, run a model, save the text, rename the file, find the job folder, then paste the transcript back under the recording.
 
-This repo collapses that into: **right-click the recording → Share → done.**
+This repo turns that into a durable macOS workflow:
 
-## What it does
+**Share the recording -> choose a job folder -> receive a filed `.txt` transcript and Notes-ready plaintext.**
 
-1. You share the call recording from Apple Notes (or Finder) into a macOS Shortcut.
-2. The Shortcut prompts for the job folder.
-3. A zsh script transcribes the audio through whichever engine is available — MacWhisper CLI (`mw transcribe`) when it works, or `whisper.cpp` as an automatic fallback.
-4. The transcript is saved as a timestamped `.txt` under `<job_folder>/Call Transcripts/`.
-5. The same plaintext is returned to the Shortcut, which appends it directly under the original recording in the Note.
+The design deliberately avoids scraping the hidden Apple Notes database. Notes stays in charge of notes, Shortcuts handles the handoff, and transcription stays local.
 
-No Notes-database scraping, no AppleScript reverse-engineering, no third-party services.
+## What It Does
 
-## Features
+| Step | Result |
+| --- | --- |
+| Export or share an Apple Notes call recording | Audio arrives from the Share Sheet or Finder Quick Action |
+| Pick the job folder | The script creates `<job_folder>/Call Transcripts/` |
+| Transcribe locally | Uses MacWhisper CLI when available, with `whisper.cpp` as a fallback |
+| Save the transcript | Writes a timestamped `.txt` file with source, timestamp, engine, and script version |
+| Return plaintext | Prints the transcript to stdout so Shortcuts can append it back into Notes |
 
-- One-click Share Sheet integration via macOS Shortcuts.
-- Per-call job-folder routing — never lose track of which call goes where.
-- **Two-engine auto-failover.** Prefers MacWhisper's `mw` CLI; transparently falls back to `whisper.cpp` (`whisper-cli`) when `mw` can't load. Force one with `TRANSCRIBE_ENGINE=mw|whisper-cpp`.
-- Header block on every transcript: source audio, timestamp, engine + model used, script version.
-- Robust filename sanitisation for tricky recording names.
-- Optional model overrides via `MW_MODEL` / `WHISPER_MODEL` / `WHISPER_LANG` env vars or config file.
-- Built-in `doctor.sh` reports which engine(s) are usable on this host.
-- Strict zsh, strict-mode, error-to-stderr — safe to chain in Shortcuts.
+## Feature Set
+
+| <img src="assets/icons/apple-notes-audio.png" width="82" alt="Audio export icon"> | <img src="assets/icons/macwhisper-cli.png" width="82" alt="Transcription engine icon"> | <img src="assets/icons/job-folder-transcript.png" width="82" alt="Job folder transcript icon"> | <img src="assets/icons/shortcut-automation.png" width="82" alt="Shortcut automation icon"> |
+| --- | --- | --- | --- |
+| **Share Sheet input**<br>Accepts audio from Notes or Finder through a macOS Shortcut. | **Two-engine failover**<br>Prefers `mw transcribe`; falls back to `whisper-cli` when `mw` cannot load. | **Job-folder output**<br>Saves every transcript under `Call Transcripts/` with a safe timestamped filename. | **Notes append path**<br>Returns clean plaintext for Shortcuts to append under the original recording. |
+
+## How It Works
+
+```mermaid
+flowchart LR
+  A["Apple Notes call recording"] --> B["Share Sheet / Quick Action"]
+  B --> C["macOS Shortcut"]
+  C --> D["Choose job folder"]
+  D --> E["transcribe_call.zsh"]
+  E --> F{"Engine available?"}
+  F -->|"mw works"| G["MacWhisper CLI"]
+  F -->|"mw broken or absent"| H["whisper.cpp fallback"]
+  G --> I["Transcript text"]
+  H --> I
+  I --> J["Job Folder / Call Transcripts / timestamp.txt"]
+  I --> K["Shortcut appends plaintext back into Notes"]
+```
 
 ## Requirements
 
-- macOS (tested on 15+).
-- At least one transcription engine:
-  - **MacWhisper Pro** with the Command-Line Tool installed (Settings → Advanced → Command-Line Tool), **or**
-  - **whisper.cpp** via `brew install whisper-cpp` plus a ggml model file (default expected at `~/.local/share/whisper-cpp/models/ggml-base.en.bin`).
-- Apple Shortcuts.app (preinstalled).
-- zsh (default macOS shell).
-- `afconvert` (built-in macOS) — used when transcoding for the whisper.cpp path.
+- macOS with Shortcuts.app.
+- zsh, included with macOS.
+- `afconvert`, included with macOS.
+- At least one local transcription engine:
+  - **MacWhisper Pro** with the Command-Line Tool installed from MacWhisper > Settings > Advanced > Command-Line Tool.
+  - **or** `whisper.cpp` from Homebrew with a ggml model file.
 
-## Quick start
+The current script auto-selects the first working engine. If MacWhisper's bundled `mw` binary cannot dyld-load on your macOS, the fallback keeps the workflow usable today.
+
+## Quick Start
 
 ```sh
 git clone git@github.com:tyhallcsu/macwhisper-transcription-automation.git
 cd macwhisper-transcription-automation
 ./scripts/install.sh
 
-# Put the script on your PATH for the Shortcut to find:
 mkdir -p ~/bin
 ln -sfn "$(pwd)/scripts/transcribe_call.zsh" ~/bin/transcribe_call.zsh
 ```
 
-Then build the Shortcut: see **[docs/shortcut-workflow.md](docs/shortcut-workflow.md)**.
-
-## Smoke test
+If you need the fallback engine:
 
 ```sh
-mkdir -p /tmp/mw-smoke
-cp ~/some-recording.m4a /tmp/mw-smoke/sample.m4a
-~/bin/transcribe_call.zsh /tmp/mw-smoke/sample.m4a /tmp/mw-smoke
-ls "/tmp/mw-smoke/Call Transcripts/"
+brew install whisper-cpp
+mkdir -p ~/.local/share/whisper-cpp/models
+curl -L -o ~/.local/share/whisper-cpp/models/ggml-base.en.bin \
+  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
 ```
 
-## File-naming convention
+Check the machine:
+
+```sh
+./scripts/doctor.sh
+```
+
+Then build the Shortcut: **[docs/shortcut-workflow.md](docs/shortcut-workflow.md)**.
+
+## Shortcut Summary
+
+Create a macOS Shortcut named **ESS Transcribe Call Recording**:
+
+1. Enable **Use as Quick Action** and **Use from Share Sheet**.
+2. Accept `Audio` and `Files`.
+3. Add **Get Folder**, configured as **Ask Each Time**.
+4. Add **Run Shell Script**, shell `/bin/zsh`, pass input **as arguments**.
+5. Paste:
+   ```zsh
+   "$HOME/bin/transcribe_call.zsh" "$1" "$JOB_FOLDER"
+   ```
+6. Replace `$JOB_FOLDER` with the folder magic variable from step 3.
+7. Add **Append to Note** and use **Shell Script Result** as the text.
+
+Full walkthrough: **[docs/shortcut-workflow.md](docs/shortcut-workflow.md)**.
+
+## Output Example
 
 Recommended Note title:
-```
+
+```text
 JobName - Call with Person - Date
 ```
 
-Example transcript output:
-```
+Transcript output:
+
+```text
 <job_folder>/Call Transcripts/2026-05-08 14.32.05 - Acme-Call-with-Vendor.txt
 ```
 
-## Privacy & security
+The file contains a compact header:
 
-- The script never uploads audio anywhere — everything runs locally through MacWhisper.
-- `.gitignore` blocks `*.m4a`, `*.mp3`, `*.wav`, `*.txt`-flavoured transcripts under `Call Transcripts/`, `*.env`, and any folder named `private/`, `local/`, `exports/`, or `transcripts/`.
-- Customer/job names, addresses, phone numbers, and absolute home paths must not be committed. See [CONTRIBUTING.md](CONTRIBUTING.md).
-- The optional config file lives at `~/.config/macwhisper-automation/config.env` and is never read from inside the repo.
+```text
+Call Transcript
+Source Audio:   call-recording.m4a
+Transcribed:    2026-05-08 14:32:05
+Engine:         whisper.cpp (/opt/homebrew/bin/whisper-cli) using ggml-base.en.bin
+Script Version: 0.2.0
+```
 
-## Limitations
+## Privacy Guardrails
 
-- Notes append happens **via the Shortcut**, not by writing to the Apple Notes database. That's deliberate — see [docs/watch-folder.md](docs/watch-folder.md#why-we-dont-scrape-the-notes-database).
-- The Shortcut runs on macOS only. iOS Shortcuts can't execute zsh.
-- MacWhisper CLI is gated behind MacWhisper Pro.
-- The bundled `mw` CLI must dyld-load on your macOS. In some MacWhisper releases the GUI and CLI ship with mismatched min-OS targets — the GUI runs fine while `mw` fails with a "Library not loaded" error. That's an upstream packaging bug, not anything wrong with your install. See [docs/troubleshooting.md](docs/troubleshooting.md#mw-wont-launch--library-not-loaded--newer-than-running-os).
+This repo is private, but it is built like a project that could safely be public.
+
+- No audio files, transcripts, customer folders, tokens, or local env files should ever be committed.
+- `.gitignore` blocks common recording formats, transcript folders, logs, local config, and private/export folders.
+- The script runs transcription locally. It does not upload recordings to a third-party transcription service.
+- README visuals are synthetic raster images. They do not contain real call recordings, transcripts, names, addresses, or local paths.
+- Future screenshots must use fake data only.
+
+Before committing:
+
+```sh
+git diff --cached --name-only | grep -Ei '\.(m4a|mp3|wav|aiff|aac|flac|mp4|mov|transcript|log|env)$|Call Transcripts|private|exports|transcripts' && echo "STOP: private file staged" || echo "No obvious private files staged"
+```
+
+## Visual Assets
+
+<p align="center">
+  <picture>
+    <source srcset="assets/images/social-preview.webp" type="image/webp">
+    <img src="assets/images/social-preview.png" alt="Social preview visual showing audio flowing into a transcript and notes-style pane" width="80%">
+  </picture>
+</p>
+
+This README uses real generated raster assets stored in the repo:
+
+- Hero image: `assets/images/hero-macwhisper-notes-transcription.png`
+- App/repo icon: `assets/icons/app-icon.png`
+- Feature icons: `assets/icons/*.png`
+- Social preview candidate: `assets/images/social-preview.png`
+- Prompts and regeneration notes: **[docs/assets.md](docs/assets.md)**
+
+Validate README image references with:
+
+```sh
+./scripts/check_readme_assets.sh
+```
 
 ## Documentation
 
-- **[Setup](docs/setup.md)** — install, symlink, smoke test.
-- **[Shortcut workflow](docs/shortcut-workflow.md)** — wire up Shortcuts.app step-by-step.
-- **[Watch folder](docs/watch-folder.md)** — optional drag-and-drop mode.
-- **[Troubleshooting](docs/troubleshooting.md)** — common failure modes and fixes.
-- **[Contributing](CONTRIBUTING.md)** — privacy rules, commit style.
+- **[Setup](docs/setup.md)** - install engines, symlink, smoke test.
+- **[Shortcut workflow](docs/shortcut-workflow.md)** - build the Shortcuts.app flow.
+- **[Watch folder](docs/watch-folder.md)** - optional drag-and-drop mode.
+- **[Troubleshooting](docs/troubleshooting.md)** - common failure modes and fixes.
+- **[Visual assets](docs/assets.md)** - asset inventory and regeneration prompts.
+- **[Contributing](CONTRIBUTING.md)** - privacy rules and commit style.
+
+## Limitations
+
+- The Shortcut runs on macOS only. iOS Shortcuts cannot execute zsh.
+- Appending back into Notes is handled by Shortcuts, not by editing the Apple Notes database.
+- MacWhisper CLI requires MacWhisper Pro.
+- Some MacWhisper releases ship a GUI that works while the bundled `mw` CLI cannot dyld-load. That is an upstream CLI build issue; `whisper.cpp` fallback is wired to keep this repo useful.
 
 ## Roadmap
 
-- [ ] `--model` shortcut flag pass-through (today only via env / config).
-- [ ] Multi-language support via `MW_LANG`.
-- [ ] Optional speaker-diarization in the header block.
-- [ ] Bundled "presets" (e.g. `mw-fast`, `mw-accurate`) selectable per job.
-- [ ] Pre-flight ffmpeg re-encoding for unusual codecs.
+- [ ] Shortcut flag pass-through for engine/model selection.
+- [ ] Multi-language polish around `WHISPER_LANG`.
+- [ ] Optional speaker diarization metadata in the transcript header.
+- [ ] Engine presets such as `fast`, `balanced`, and `accurate`.
+- [ ] Pre-flight codec normalization for unusual source audio.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
