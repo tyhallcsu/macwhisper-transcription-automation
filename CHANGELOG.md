@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Reframed the `mw` dyld failure mode as a MacWhisper packaging bug (CLI built with `minos 26.4` while the GUI ships with `LSMinimumSystemVersion = 14.0`) rather than a user-side macOS issue. `doctor.sh` and `docs/troubleshooting.md` no longer recommend upgrading macOS or reinstalling MacWhisper; they recommend reporting the bug upstream and offer a `whisper.cpp` fallback path.
+
 ## [0.1.0] — 2026-05-08
 
 ### Added

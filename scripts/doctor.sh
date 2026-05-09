@@ -38,7 +38,7 @@ if [[ -n "$mw_bin" ]]; then
     ok "mw responds to 'mw version'"
   else
     if grep -qiE 'library not loaded|newer than running OS|dyld' "$mw_err"; then
-      fail "mw is installed but won't launch on this macOS version. Install a MacWhisper build matching your macOS, or upgrade macOS. See docs/troubleshooting.md"
+      fail "MacWhisper's bundled mw binary won't launch on this host (dyld rejects it). The MacWhisper.app GUI is fine — this is a CLI-build mismatch in the shipped MacWhisper version. See docs/troubleshooting.md"
     else
       fail "mw failed: $(head -n1 "$mw_err")"
     fi

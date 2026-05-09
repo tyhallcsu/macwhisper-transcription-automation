@@ -10,17 +10,24 @@ dyld[…]: Library not loaded: /usr/lib/swift/libswift_DarwinFoundation1.dylib
                    (built for macOS 26.4 which is newer than running OS)
 ```
 
-**Cause.** The installed MacWhisper.app was built against a newer macOS SDK than the one your host is running. The bundled CLI links against system Swift libraries that don't exist on your macOS yet.
+**This is a MacWhisper packaging bug, not a problem with your setup.** Verify with:
 
-**Fix — pick one:**
-
-1. **Install a MacWhisper build that matches your macOS.** From the developer site, look for the "Compatible with macOS X" download (or check the Mac App Store version, which Apple gates per OS). Replace `/Applications/MacWhisper.app`, then re-run **Settings → Advanced → Command-Line Tool → Install**.
-2. **Upgrade macOS** to the version MacWhisper was built for. (Not always desirable — verify any other apps you depend on first.)
-
-After fixing, re-run:
 ```sh
-./scripts/doctor.sh
+otool -l /Applications/MacWhisper.app/Contents/MacOS/mw | grep -A2 LC_BUILD_VERSION | head -6
+defaults read /Applications/MacWhisper.app/Contents/Info LSMinimumSystemVersion
 ```
+
+In MacWhisper 13.20 (build 1410), the GUI binary advertises `LSMinimumSystemVersion = 14.0`, while the CLI binary inside the same bundle is compiled with `minos 26.4`. dyld correctly refuses to load a binary that asks for a newer macOS than the host. The GUI runs fine; only the CLI is broken.
+
+You cannot work around this with `DYLD_FRAMEWORK_PATH`, library shimming, or env tweaks — `libswift_DarwinFoundation1.dylib` was renamed in the macOS 26 SDK and no equivalent file exists on macOS 14/15.
+
+**What to do:**
+
+1. **Report it to MacWhisper support** (`support@macwhisper.com`). The fix is for them to rebuild `mw` with the same `-mmacosx-version-min` flag the GUI uses (14.0).
+2. **Until then**, transcribe via the MacWhisper GUI's Watch Folders feature (see [watch-folder.md](watch-folder.md)) and use this repo's Shortcut only for the file-routing/Notes-append part.
+3. **Or**, install an alternative engine like `whisper.cpp` (`brew install whisper-cpp`) and run the Shortcut against that. Ask in this repo and we can wire `transcribe_call.zsh` to fall back to it.
+
+After MacWhisper ships a corrected `mw`, re-run **Settings → Advanced → Command-Line Tool → Install** and then `./scripts/doctor.sh`.
 
 ## Shortcut runs but the transcript is empty
 

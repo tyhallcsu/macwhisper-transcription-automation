@@ -82,7 +82,7 @@ Example transcript output:
 - Notes append happens **via the Shortcut**, not by writing to the Apple Notes database. That's deliberate — see [docs/watch-folder.md](docs/watch-folder.md#why-we-dont-scrape-the-notes-database).
 - The Shortcut runs on macOS only. iOS Shortcuts can't execute zsh.
 - MacWhisper CLI is gated behind MacWhisper Pro.
-- A MacWhisper build that targets a newer macOS than your host will fail to launch — see [docs/troubleshooting.md](docs/troubleshooting.md#mw-wont-launch--library-not-loaded--newer-than-running-os).
+- The bundled `mw` CLI must dyld-load on your macOS. In some MacWhisper releases the GUI and CLI ship with mismatched min-OS targets — the GUI runs fine while `mw` fails with a "Library not loaded" error. That's an upstream packaging bug, not anything wrong with your install. See [docs/troubleshooting.md](docs/troubleshooting.md#mw-wont-launch--library-not-loaded--newer-than-running-os).
 
 ## Documentation
 
