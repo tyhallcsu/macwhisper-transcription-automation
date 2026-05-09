@@ -47,7 +47,7 @@ jobs:
             --prefix="macwhisper-transcription-automation-${version}/" \
             -o "dist/macwhisper-transcription-automation-${version}.tar.gz" \
             "$tag"
-          (cd dist && shasum -a 256 *.tar.gz > SHA256SUMS.txt)
+          (cd dist && shasum -a 256 ./*.tar.gz > SHA256SUMS.txt)
           ls -la dist
 
       - name: Publish release
