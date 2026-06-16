@@ -38,21 +38,16 @@ ls ~/.local/share/whisper-cpp/models/
 ```sh
 git clone git@github.com:tyhallcsu/macwhisper-transcription-automation.git
 cd macwhisper-transcription-automation
-./scripts/install.sh
+./scripts/install-local.sh
 ```
 
-The installer sets executable bits and runs `doctor.sh`. Expect a clean `Summary: N passing, 0 failing`.
+The local installer sets executable bits, creates or refreshes `~/bin/transcribe_call.zsh`, runs `doctor.sh`, and prints the manual Shortcuts.app setup step.
+Expect a clean `Summary: N passing, 0 failing` from `doctor.sh` (warnings are okay when a fallback engine is ready).
 
-## 3. Symlink the script onto your PATH
+## 3. Optional shell PATH setup
 
-The macOS Shortcut will invoke the script by absolute path. Putting it in `~/bin` makes the Shortcut survive moves of the repo:
-
-```sh
-mkdir -p ~/bin
-ln -sfn "$(pwd)/scripts/transcribe_call.zsh" ~/bin/transcribe_call.zsh
-```
-
-If `~/bin` is not on your PATH yet:
+The Shortcut invokes the script by absolute path via `$HOME/bin/transcribe_call.zsh`.
+If you also want to run `transcribe_call.zsh` directly by name in interactive shells, add `~/bin` to your PATH:
 
 ```sh
 print 'export PATH="$HOME/bin:$PATH"' >> ~/.zprofile
@@ -72,13 +67,10 @@ Uncomment a `MW_MODEL=…` line to force a specific transcription model.
 ## 5. Smoke test
 
 ```sh
-mkdir -p /tmp/mw-smoke
-cp /path/to/some-recording.m4a /tmp/mw-smoke/sample.m4a
-~/bin/transcribe_call.zsh /tmp/mw-smoke/sample.m4a /tmp/mw-smoke
-ls "/tmp/mw-smoke/Call Transcripts/"
+./scripts/smoke_test_local.sh
 ```
 
-You should see a single `.txt` file with a header and the transcript body.
+You should see a disposable `.txt` file with a header and transcript body under `/tmp/test-job/Call Transcripts/`.
 
 ## 6. Build the Shortcut
 

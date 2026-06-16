@@ -1,6 +1,6 @@
 # Contributing
 
-This repo is private but treated like a polished public project. Keep changes small, reviewable, and free of customer data.
+This repo is public and privacy-sensitive. Keep changes small, reviewable, and free of customer data.
 
 ## Workflow
 
@@ -30,7 +30,7 @@ Before every commit:
 ```bash
 git status
 git diff --cached
-git ls-files | grep -Ei '\.(m4a|mp3|wav|aiff|mov|mp4)$|transcripts?/|exports?/' || echo "clean"
+./scripts/privacy_guard.sh
 ```
 
 If something private slipped in:

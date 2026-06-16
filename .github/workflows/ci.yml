@@ -36,7 +36,7 @@ jobs:
         continue-on-error: true
         with:
           severity: warning
-          additional_files: 'scripts/check_readme_assets.sh scripts/doctor.sh scripts/install.sh scripts/transcribe_call.zsh'
+          additional_files: 'scripts/check_readme_assets.sh scripts/doctor.sh scripts/install-local.sh scripts/install.sh scripts/privacy_guard.sh scripts/smoke_test_local.sh scripts/transcribe_call.zsh'
           format: gcc
 
       - name: markdownlint
@@ -68,16 +68,10 @@ jobs:
       - name: Install zsh (needed by check_readme_assets.sh)
         run: sudo apt-get update && sudo apt-get install -y zsh
 
-      - name: No audio / transcripts / env files tracked
+      - name: Privacy guard
         run: |
-          set -e
-          forbidden="$(git ls-files | grep -Ei '\.(m4a|mp3|wav|aiff|aac|flac|ogg|mov|mp4|transcript)$|^transcripts/|^exports/|Call Transcripts/|^private/' || true)"
-          if [ -n "$forbidden" ]; then
-            echo "::error::Forbidden private files tracked:"
-            printf '%s\n' "$forbidden"
-            exit 1
-          fi
-          echo "OK — no private/audio files tracked."
+          chmod +x scripts/privacy_guard.sh
+          ./scripts/privacy_guard.sh
 
       - name: README image references resolve
         run: |

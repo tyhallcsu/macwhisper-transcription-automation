@@ -88,9 +88,9 @@ fi
 
 # 7. ~/bin
 if [[ -d "$HOME/bin" ]]; then
-  ok "~/bin exists"
+  ok "$HOME/bin exists"
 else
-  info "~/bin not present — install.sh will guide you"
+  info "$HOME/bin not present — install.sh will guide you"
 fi
 
 print -- ""

@@ -81,10 +81,7 @@ The current script auto-selects the first working engine. If MacWhisper's bundle
 ```sh
 git clone git@github.com:tyhallcsu/macwhisper-transcription-automation.git
 cd macwhisper-transcription-automation
-./scripts/install.sh
-
-mkdir -p ~/bin
-ln -sfn "$(pwd)/scripts/transcribe_call.zsh" ~/bin/transcribe_call.zsh
+./scripts/install-local.sh
 ```
 
 If you need the fallback engine:
@@ -100,9 +97,12 @@ Check the machine:
 
 ```sh
 ./scripts/doctor.sh
+./scripts/smoke_test_local.sh
 ```
 
 Then build the Shortcut: **[docs/shortcut-workflow.md](docs/shortcut-workflow.md)**.
+
+Local install details: **[docs/local-install.md](docs/local-install.md)**.
 
 ## Shortcut Summary
 
@@ -158,7 +158,7 @@ This repo is public; it has always been built so that nothing private would land
 Before committing:
 
 ```sh
-git diff --cached --name-only | grep -Ei '\.(m4a|mp3|wav|aiff|aac|flac|mp4|mov|transcript|log|env)$|Call Transcripts|private|exports|transcripts' && echo "STOP: private file staged" || echo "No obvious private files staged"
+./scripts/privacy_guard.sh
 ```
 
 ## Visual Assets
@@ -187,9 +187,11 @@ Validate README image references with:
 ## Documentation
 
 - **[Setup](docs/setup.md)** - install engines, symlink, smoke test.
+- **[Local install](docs/local-install.md)** - install this workflow on your Mac.
 - **[Shortcut workflow](docs/shortcut-workflow.md)** - build the Shortcuts.app flow.
 - **[Watch folder](docs/watch-folder.md)** - optional drag-and-drop mode.
 - **[Troubleshooting](docs/troubleshooting.md)** - common failure modes and fixes.
+- **[Development workflows](docs/development-workflows.md)** - useful ESS workflows and local guardrails.
 - **[Visual assets](docs/assets.md)** - asset inventory and regeneration prompts.
 - **[Contributing](CONTRIBUTING.md)** - privacy rules and commit style.
 
@@ -207,6 +209,7 @@ Validate README image references with:
 - [ ] Optional speaker diarization metadata in the transcript header.
 - [ ] Engine presets such as `fast`, `balanced`, and `accurate`.
 - [ ] Pre-flight codec normalization for unusual source audio.
+- [ ] v0.4: optional Notes call project-sync mode, explicitly opt-in, read-only against Notes data, and never committing raw audio.
 
 ## License
 

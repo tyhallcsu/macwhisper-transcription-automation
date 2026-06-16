@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `scripts/privacy_guard.sh` for a reusable tracked/staged-file privacy check that allows safe example config while rejecting recordings, transcripts, logs, secrets, and private/export folders.
+- `scripts/install-local.sh` and `scripts/smoke_test_local.sh` for idempotent local install and disposable end-to-end smoke testing.
+- `docs/local-install.md` and `docs/development-workflows.md` covering local setup, Shortcuts CLI limitations, and useful local ESS workflow references.
+
+### Changed
+- CI now runs the repo privacy guard script instead of a broad inline grep.
+- README Quick Start now uses the local installer and links to the new local/development workflow docs.
+
 ## [0.3.0] — 2026-05-09
 
 ### Added
