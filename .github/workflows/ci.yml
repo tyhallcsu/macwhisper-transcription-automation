@@ -18,7 +18,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install zsh
         run: sudo apt-get update && sudo apt-get install -y zsh
@@ -63,7 +63,7 @@ jobs:
     name: Privacy guard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install zsh (needed by check_readme_assets.sh)
         run: sudo apt-get update && sudo apt-get install -y zsh
@@ -82,7 +82,7 @@ jobs:
     name: macOS smoke test (whisper.cpp engine)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install whisper.cpp
         run: brew install whisper-cpp
