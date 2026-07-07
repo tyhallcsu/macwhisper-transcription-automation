@@ -2,6 +2,8 @@
 
 This Shortcut takes an audio file (typically a call recording shared from Apple Notes), prompts for a job folder, transcribes via MacWhisper, saves the `.txt`, and appends the transcript back into the originating Note.
 
+Important: Shortcuts receives the shared audio file, not a durable reference to the source Note. The **Append to Note** action must therefore ask which Note to update. When the picker appears, choose the same Note that contains the recording; the transcript text is appended there.
+
 ## Prerequisites
 
 - `~/bin/transcribe_call.zsh` exists and is executable (see [setup.md](setup.md)).
@@ -40,7 +42,7 @@ This Shortcut takes an audio file (typically a call recording shared from Apple 
 - Action: **Append to Note** (under Notes).
 - **Text**: the **Shell Script Result** magic variable.
 - **Note**: either:
-  - **Ask Each Time** — pick the matching Note manually each run, or
+  - **Ask Each Time** — pick the matching Note manually each run. This is the recommended setup when sharing recordings from Apple Notes because the Shortcut receives the audio attachment, not the originating Note object.
   - A specific note if you keep one running call log.
 
 ### Action 5 (optional) — Show notification
@@ -51,8 +53,9 @@ This Shortcut takes an audio file (typically a call recording shared from Apple 
 1. In Apple Notes, locate the call recording. Right-click → **Save Attachment…** to a known folder (e.g. `~/Downloads`), or use **Share Audio**.
 2. From Finder/the Share Sheet, send the audio file to **Transcribe Call Recording**.
 3. Pick the job folder.
-4. Wait for MacWhisper to finish.
-5. The `.txt` lands in `<job_folder>/Call Transcripts/`, and the same text appends below the original Note's audio attachment.
+4. Wait for MacWhisper or the configured fallback engine to finish.
+5. When Notes asks for a target Note, choose the Note that contains the recording.
+6. The `.txt` lands in `<job_folder>/Call Transcripts/`, and the same transcript text appends to the selected Note.
 
 ## Naming convention recommendation
 

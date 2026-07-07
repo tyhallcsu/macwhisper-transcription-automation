@@ -30,7 +30,7 @@ This repo turns that into a durable macOS workflow:
 
 **Share the recording -> choose a job folder -> receive a filed `.txt` transcript and Notes-ready plaintext.**
 
-The design deliberately avoids scraping the hidden Apple Notes database. Notes stays in charge of notes, Shortcuts handles the handoff, and transcription stays local.
+The design deliberately avoids scraping the hidden Apple Notes database. Notes stays in charge of notes, Shortcuts handles the handoff, and transcription stays local. Because the Share Sheet hands Shortcuts the audio attachment rather than the originating Note, the Shortcut asks you to choose the matching Note before appending the transcript.
 
 ## What It Does
 
@@ -46,7 +46,7 @@ The design deliberately avoids scraping the hidden Apple Notes database. Notes s
 
 | <img src="assets/icons/apple-notes-audio.png" width="82" alt="Audio export icon"> | <img src="assets/icons/macwhisper-cli.png" width="82" alt="Transcription engine icon"> | <img src="assets/icons/job-folder-transcript.png" width="82" alt="Job folder transcript icon"> | <img src="assets/icons/shortcut-automation.png" width="82" alt="Shortcut automation icon"> |
 | --- | --- | --- | --- |
-| **Share Sheet input**<br>Accepts audio from Notes or Finder through a macOS Shortcut. | **Two-engine failover**<br>Prefers `mw transcribe`; falls back to `whisper-cli` when `mw` cannot load. | **Job-folder output**<br>Saves every transcript under `Call Transcripts/` with a safe timestamped filename. | **Notes append path**<br>Returns clean plaintext for Shortcuts to append under the original recording. |
+| **Share Sheet input**<br>Accepts audio from Notes or Finder through a macOS Shortcut. | **Two-engine failover**<br>Prefers `mw transcribe`; falls back to `whisper-cli` when `mw` cannot load. | **Job-folder output**<br>Saves every transcript under `Call Transcripts/` with a safe timestamped filename. | **Notes append path**<br>Returns clean plaintext for Shortcuts to append to the Note you select. |
 
 ## How It Works
 
@@ -118,6 +118,7 @@ Create a macOS Shortcut named **Transcribe Call Recording**:
    ```
 6. Replace `$JOB_FOLDER` with the folder magic variable from step 3.
 7. Add **Append to Note** and use **Shell Script Result** as the text.
+8. Set the Note field to **Ask Each Time**, then choose the Note containing the recording when the Shortcut runs.
 
 Full walkthrough: **[docs/shortcut-workflow.md](docs/shortcut-workflow.md)**.
 
