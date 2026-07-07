@@ -20,24 +20,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install zsh
-        run: sudo apt-get update && sudo apt-get install -y zsh
+      - name: Install shell tooling
+        run: sudo apt-get update && sudo apt-get install -y shellcheck zsh
 
       - name: zsh syntax check
         run: |
           set -e
-          for f in scripts/*.sh scripts/*.zsh; do
+          for f in scripts/*.sh scripts/*.zsh examples/*.zsh; do
             echo "==> zsh -n $f"
             zsh -n "$f"
           done
 
-      - name: shellcheck (best-effort, bash mode)
-        uses: ludeeus/action-shellcheck@2.0.0
-        continue-on-error: true
-        with:
-          severity: warning
-          additional_files: 'scripts/check_readme_assets.sh scripts/doctor.sh scripts/install-local.sh scripts/install.sh scripts/privacy_guard.sh scripts/smoke_test_local.sh scripts/transcribe_call.zsh'
-          format: gcc
+      - name: shellcheck (bash-compatible files only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(
+            find scripts examples -type f \
+              \( -name '*.bash' -o -name '*.ksh' \) \
+              -print
+          )
+          if (( ${#files[@]} == 0 )); then
+            echo "shellcheck: no bash-compatible scripts found"
+            exit 0
+          fi
+          shellcheck -S warning --format=gcc "${files[@]}"
 
       - name: markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v17
